@@ -10,68 +10,80 @@ services:
     volumes: 
       - historical_db_volumes:/var/lib/postgresql/data
 
-  airflow_db:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: airflow_db 
-      POSTGRES_USER: airflow_user 
-      POSTGRES_PASSWORD: airflowpassword 
-    volumes:
-      - airflowdb_volumes:/var/lib/postgresql/data
-
-  init_airflow:
-    image: apache/airflow:2.9.3
-    volumes: 
-      - ./scripts/init_airflow.sh:/scripts/init_airflow.sh
-    environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db
-    entrypoint: ["/bin/bash", "/scripts/init_airflow.sh"]
-    healthcheck:
-      test: ["CMD-SHELL", "airflow db check"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  webserver:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    user: root
-    depends_on:
-      init_airflow:
-        condition: service_completed_successfully
-    volumes: 
-      - ./airflow/dags:/opt/airflow/dags
+  jenkins:
+    build: .
+    container_name: jenkins
     ports:
       - "8080:8080"
-    command: webserver 
-    environment:
-     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db 
-     - AIRFLOW__API__AUTH_MANAGER=airflow.api.auth.backend.fab.FABAuthBackend 
-     - _AIRFLOW_WWW_USER_CREATE=True
-     - _AIRFLOW_WWW_USER_USERNAME=admin
-     - _AIRFLOW_WWW_USER_PASSWORD=admin
-     - _AIRFLOW_WWW_USER_FIRSTNAME=Airflow
-     - _AIRFLOW_WWW_USER_LASTNAME=Admin
-     - _AIRFLOW_WWW_USER_EMAIL=admin@example.com
-     - _AIRFLOW_WWW_USER_ROLE=Admin
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./sql:/var/jenkins_home/workspace/createdb
+    restart: unless-stopped
+
+  # airflow_db:
+  #   image: postgres:latest
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: airflow_db 
+  #     POSTGRES_USER: airflow_user 
+  #     POSTGRES_PASSWORD: airflowpassword 
+  #   volumes:
+  #     - airflowdb_volumes:/var/lib/postgresql/data
+
+  # init_airflow:
+  #   image: apache/airflow:2.9.3
+  #   volumes: 
+  #     - ./scripts/init_airflow.sh:/scripts/init_airflow.sh
+  #   environment:
+  #     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db
+  #   entrypoint: ["/bin/bash", "/scripts/init_airflow.sh"]
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "airflow db check"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+
+  # webserver:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   user: root
+  #   depends_on:
+  #     init_airflow:
+  #       condition: service_completed_successfully
+  #   volumes: 
+  #     - ./airflow/dags:/opt/airflow/dags
+  #   ports:
+  #     - "8080:8080"
+  #   command: webserver 
+  #   environment:
+  #    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db 
+  #    - AIRFLOW__API__AUTH_MANAGER=airflow.api.auth.backend.fab.FABAuthBackend 
+  #    - _AIRFLOW_WWW_USER_CREATE=True
+  #    - _AIRFLOW_WWW_USER_USERNAME=admin
+  #    - _AIRFLOW_WWW_USER_PASSWORD=admin
+  #    - _AIRFLOW_WWW_USER_FIRSTNAME=Airflow
+  #    - _AIRFLOW_WWW_USER_LASTNAME=Admin
+  #    - _AIRFLOW_WWW_USER_EMAIL=admin@example.com
+  #    - _AIRFLOW_WWW_USER_ROLE=Admin
  
-  scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    user: root
-    depends_on:
-      init_airflow:
-        condition: service_completed_successfully
-    volumes: 
-      - ./airflow/dags:/opt/airflow/dags
-    command: scheduler 
-    environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db
+  # scheduler:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   user: root
+  #   depends_on:
+  #     init_airflow:
+  #       condition: service_completed_successfully
+  #   volumes: 
+  #     - ./airflow/dags:/opt/airflow/dags
+  #   command: scheduler 
+  #   environment:
+  #     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflowpassword@airflow_db:5432/airflow_db
  
 volumes:
   historical_db_volumes:
-  airflowdb_volumes:
+  jenkins_home: 
+    # airflowdb_volumes:
