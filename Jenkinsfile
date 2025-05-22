@@ -9,7 +9,7 @@ pipeline {
 		stage('Create Table') {
 			steps {
 				sh '''
-					psql -h localhost -U icanooo -d historical_db -f createdb/create_tables.sql
+					psql -h application_postgres -U icanooo -d historical_db -f /var/jenkins_home/sql/create_tables.sql
 				'''
 			}
 		}

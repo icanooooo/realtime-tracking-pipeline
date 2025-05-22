@@ -17,10 +17,10 @@ services:
     container_name: jenkins
     ports:
       - "8080:8080"
-      - "50000:50000"
+      - "10000:10000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - ./sql:/var/jenkins_home/workspace/createdb
+      - ./sql:/var/jenkins_home/sql
     restart: unless-stopped
     networks:
       - jenkins-net
