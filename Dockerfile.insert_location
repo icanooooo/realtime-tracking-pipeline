@@ -1,0 +1,6 @@
+FROM python:3.12
+
+WORKDIR /app
+COPY . /APP
+
+RUN pip install sqlalchemy psycopg2-binary pandas

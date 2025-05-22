@@ -10,9 +10,28 @@ services:
     volumes: 
       - historical_db_volumes:/var/lib/postgresql/data
       - ./scripts/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icanooo -d historical_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
     networks:
       - jenkins-net
 
+  insert_location:
+    build:
+      context: .
+      dockerfile: Dockerfile.insert_location
+    depends_on:
+      application_postgres:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/app
+    command: ["python", "insert_location.py"]
+    networks:
+      - jenkins-net
+   
   jenkins:
     build: .
     container_name: jenkins
@@ -26,6 +45,7 @@ services:
     networks:
       - jenkins-net
 
+        
 volumes:
   historical_db_volumes:
   jenkins_home: 
