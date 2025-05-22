@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: thisisapassword
     volumes: 
       - historical_db_volumes:/var/lib/postgresql/data
+      - ./scripts/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       - jenkins-net
 
