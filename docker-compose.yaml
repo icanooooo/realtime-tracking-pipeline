@@ -20,7 +20,7 @@ services:
       - "10000:10000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - ./sql:/var/jenkins_home/sql
+      - ./scripts:/var/jenkins_home/scripts
     restart: unless-stopped
     networks:
       - jenkins-net
