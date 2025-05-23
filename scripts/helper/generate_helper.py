@@ -46,3 +46,26 @@ def generate_orders(destination_df, users_df, n=1):
     orders_df = pd.DataFrame(orders)
 
     return orders_df
+
+def generate_hist_orders(orders_df):
+    data = orders_df.to_dict(orient='records')
+
+    hist_data = []
+
+    for i in data:
+         hist = {
+                 'id' : random.randint(10000, 100000 - 1),
+                 'orders_id' : i['id'],
+                 'status' : 'pending',
+                 'location' : 'not yet send',
+                 'updated_at' : datetime.now().isoformat()
+                }
+
+         hist_data.append(hist)
+
+    hist_df = pd.DataFrame(hist_data)
+
+    return hist_df
+
+
+

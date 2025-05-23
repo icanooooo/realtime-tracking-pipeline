@@ -1,4 +1,4 @@
-from helper.generate_helper import generate_users, generate_orders
+from helper.generate_helper import generate_users, generate_orders, generate_hist_orders
 from helper.to_sql import to_sql, get_sql
 
 import pandas as pd
@@ -21,10 +21,20 @@ def orders():
 
     to_sql(orders_df, "orders")
 
+def hist_orders():
+    orders = get_sql("orders")
+    
+    hist_df = generate_hist_orders(orders)
+
+    to_sql(hist_df, "orders_history")
+
+
 def main():
     users()
 
     orders()
+
+    hist_orders()
    
 if __name__ == "__main__":
     main()
