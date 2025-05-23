@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS orders_history ( 
 	id SERIAL PRIMARY KEY,
 	orders_id INT REFERENCES orders(id),
-	status TEXT NOT NULL CHECK (status in ('pending', 'packed', 'shipped', 'delivered')),
+	status TEXT NOT NULL CHECK (status in ('pending', 'packed', 'shipped', 'on transit', 'shipped to destination', 'delivered')),
+	destination_id INT REFERENCES destinations(id),
 	location TEXT,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

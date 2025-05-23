@@ -58,7 +58,8 @@ def generate_hist_orders(orders_df):
                  'orders_id' : i['id'],
                  'status' : 'pending',
                  'location' : 'not yet send',
-                 'updated_at' : datetime.now().isoformat()
+                 'updated_at' : datetime.now().isoformat(),
+                 'destination_id' : i['destination_id']
                 }
 
          hist_data.append(hist)
