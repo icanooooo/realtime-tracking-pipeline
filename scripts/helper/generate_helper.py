@@ -1,7 +1,9 @@
 from faker import Faker
+from datetime import datetime
+
 import random
 import time
-from datetime import datetime
+import pandas as pd
 
 def generate_users(n=10):
     fake = Faker() 
@@ -20,4 +22,27 @@ def generate_users(n=10):
             }
         users.append(user)
 
-    return users
+    users_df = pd.DataFrame(users)
+    
+    return users_df
+
+def generate_orders(destination_df, users_df, n=1):
+    selected_destination = destination_df.sample(n=n)
+
+    selected_user = users_df.sample(n=n)
+
+    orders = [] 
+
+    for i in range(n):
+        order = {}
+
+        order['id'] = random.randint(10000, 100000 - 1)
+        order['user_id'] = selected_user.iloc[i, selected_user.columns.get_loc('id')]
+        order['destination_id'] = selected_destination.iloc[i, selected_destination.columns.get_loc('id')]
+        order['order_date'] = datetime.now().isoformat()
+
+        orders.append(order)
+
+    orders_df = pd.DataFrame(orders)
+
+    return orders_df
