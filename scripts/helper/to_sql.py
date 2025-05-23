@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.dialects.postgresql import insert
 
-def to_sql(df, table_name):
-    engine = create_engine("postgresql+psycopg2://icanooo:thisisapassword@application_postgres:5432/historical_db")
+def to_sql(df, table_name, host="application_postgres"):
+    engine = create_engine(f"postgresql+psycopg2://icanooo:thisisapassword@{host}:5432/historical_db")
     metadata = MetaData()
 
     metadata.reflect(bind=engine)

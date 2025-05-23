@@ -1,8 +1,21 @@
 from helper.generate_helper import generate_users
+from helper.to_sql import to_sql
+
 import pandas as pd
+import random
 
-users = generate_users(10)
+def users():
 
-users_df = pd.DataFrame(users)
+    number = random.randint(25, 50)
 
-print(users_df)
+    users = generate_users(number)
+    users_df = pd.DataFrame(users)
+
+    print(users_df)
+    to_sql(users_df, "users")
+
+def main():
+    users()
+   
+if __name__ == "__main__":
+    main()

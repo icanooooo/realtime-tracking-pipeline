@@ -2,14 +2,15 @@ pipeline {
 	agent any
 
 	environment {
-		PGPASSWORD = 'thisisapassword'
+		VENV_PATH = "/opt/venv"
+		PATH = "${VENV_PATH}/bin:${env.PATH}"
 	}
 
 	stages {
 		stage('Create Table') {
 			steps {
 				sh '''
-					psql -h application_postgres -U icanooo -d historical_db -f /var/jenkins_home/sql/create_tables.sql
+					python3 /var/jenkins_home/scripts/generate_data.py
 				'''
 			}
 		}
