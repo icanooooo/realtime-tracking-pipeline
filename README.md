@@ -2,7 +2,7 @@
 
 This is a repository for implementing data streaming for a Real-Time logistics tracking. Please see below graph for the application graph:
 
-![application graph][./assets/tracker_graph.png]
+![application graph](./assets/tracker_graph.png)
 
 **Tools**
 - Jenkins
