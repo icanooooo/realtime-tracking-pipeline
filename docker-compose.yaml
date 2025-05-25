@@ -10,15 +10,16 @@ services:
     volumes: 
       - historical_db_volumes:/var/lib/postgresql/data
       - ./scripts/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./conf/custom-postgres.conf:/etc/postgresql/postgresql.conf
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U icanooo -d historical_db"]
       interval: 5s
       timeout: 5s
       retries: 5
-
     networks:
       - jenkins-net
-
+      - cdc-network
   insert_location:
     build:
       context: .
@@ -55,6 +56,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: zoo1:2888:3888
+    networks:
+      - cdc-network
 
   kafka1:
     image: confluentinc/cp-kafka:7.8.0
@@ -80,6 +83,8 @@ services:
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
     depends_on:
       - zoo1
+    networks:
+      - cdc-network  
   
   debezium:
     image: debezium/connect:2.7.3.Final
@@ -87,8 +92,9 @@ services:
       - kafka1
       - application_postgres
     ports:
-      - 8083:8083
+      - "8083:8083"
     environment:
+      BOOTSTRAP_SERVERS: kafka1:19092
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
@@ -96,6 +102,18 @@ services:
       KEY_CONVERTER_SCHEMAS_ENABLE: "false"
       VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       PLUGIN_PATH: /kafka/connect
+    networks:
+      - cdc-network
+
+  connector-init:
+    image: curlimages/curl:latest  
+    depends_on:
+      - debezium
+    volumes:
+      - ./scripts/register-connector.sh:/register-connector.sh
+    entrypoint: ["sh", "/register-connector.sh"]
+    networks:
+      - cdc-network
 
 volumes:
   historical_db_volumes:
@@ -103,3 +121,4 @@ volumes:
 
 networks:
   jenkins-net:
+  cdc-network:
