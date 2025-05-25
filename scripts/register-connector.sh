@@ -18,15 +18,16 @@ curl -X POST http://debezium:8083/connectors \
 		"database.port": "5432",
 		"database.user": "icanooo",
 		"database.password": "thisisapassword",
-		"database.dbname": "orders_history",
-		"database.server.name": "dbserver1:,
-		"plugin.name": "pgoutput:",
+		"database.dbname": "historical_db",
+		"database.server.name": "dbserver1",
+		"plugin.name": "pgoutput",
 		"slot.name": "debezium_slot",
 		"publication.name": "debezium_pub",
-		"table.incluse.list": "public.customers",
-		"tombstones.on.delete": "false"
+		"table.include.list": "public.orders_history",
+		"tombstones.on.delete": "false",
+		"topic.prefix": "orders_history"
 
 		}
-	}'
+	}' 
 
 echo "donezo"
