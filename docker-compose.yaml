@@ -20,6 +20,7 @@ services:
     networks:
       - jenkins-net
       - cdc-network
+  
   insert_location:
     build:
       context: .
