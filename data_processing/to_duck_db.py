@@ -18,6 +18,12 @@ after_schema = StructType([
     StructField("updated_at", LongType())
 ])
 
+envelope_schema = StructType([
+    StructField("payload", StructType([
+        StructField("after", after_schema),
+        StructField("op", StringType())
+    ]))
+])
 
 df_raw = spark.readStream.format("kafka")\
         .option("kafka.bootstrap.servers", "localhost:9092")\
@@ -25,8 +31,9 @@ df_raw = spark.readStream.format("kafka")\
         .load()
 
 df_parsed = df_raw.selectExpr("CAST(value AS STRING) as json_str") \
-        .select(from_json(col("json_str"), after_schema).alias("data")) \
-        .select("data.*")
+        .select(from_json(col("json_str"), envelope_schema).alias("data")) \
+        .filter(col("data.payload.op").isin("c", "u"))\
+        .select("data.payload.after.*")
 
 
 query = df_parsed.writeStream\
