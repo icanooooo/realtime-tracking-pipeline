@@ -18,25 +18,16 @@ after_schema = StructType([
     StructField("updated_at", LongType())
 ])
 
-payload_schema = StructType([
-    StructField("after", after_schema),
-    StructField("before", after_schema),
-    StructField("op", StringType()),
-    StructField("ts_ms", LongType())
-])
-
-value_schema = StructType([
-    StructField("payload", payload_schema)
-])
 
 df_raw = spark.readStream.format("kafka")\
         .option("kafka.bootstrap.servers", "localhost:9092")\
         .option("subscribe", "orders_history.public.orders_history")\
         .load()
 
-df_parsed = df_raw.selectExpr("CAST(value AS STRING)")\
-        .select(from_json(col("value"), value_schema).alias("data"))\
-        .select("data.payload.after")
+df_parsed = df_raw.selectExpr("CAST(value AS STRING) as json_str") \
+        .select(from_json(col("json_str"), after_schema).alias("data")) \
+        .select("data.*")
+
 
 query = df_parsed.writeStream\
         .format("console")\
